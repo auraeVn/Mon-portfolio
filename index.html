@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vue - Overlay et slider optimisé</title>
+  <!-- Import de Vue 3 depuis CDN -->
+  <script src="https://unpkg.com/vue@3"></script>
+  <style>
+    /* Fonts */
+    @font-face { font-family: 'PanchangExtraBold'; src: url('../WEBSITE/css/fonts/Panchang-ExtraBold.woff') format('woff'); font-weight: 800; }
+    @font-face { font-family: 'PanchangSemibold'; src: url('../WEBSITE/css/fonts/Panchang-Semibold.woff') format('woff'); font-weight: 700; }
+    @font-face { font-family: 'PanchangRegular'; src: url('../WEBSITE/css/fonts/Panchang-Regular.woff') format('woff'); font-weight: 500; }
+    @font-face { font-family: 'PanchangExtralight'; src: url('../WEBSITE/css/fonts/Panchang-Extralight.woff') format('woff'); font-weight: 300; }
+    @font-face { font-family: 'Chalise'; src: url('../WEBSITE/css/fonts/CSChalise-Regular_demo-BF66ab08ad28f4a.otf') format('opentype'); }
+
+    /* Base */
+    html, body {
+      margin: 0; padding: 0; overflow: hidden;
+      background: aquamarine;
+      background-image: linear-gradient(aquamarine, rgb(149,87,225));
+      background-attachment: fixed;
+    }
+    /* Grille principale */
+    .container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 60% 40%;
+      width: 100vw; height: 100vh;
+      position: relative;
+    }
+    .block {
+      width: 100%; height: 100%;
+      cursor: pointer;
+      display: flex;
+      justify-content: center; align-items: center;
+      background-color: lightblue;
+      box-sizing: border-box;
+      position: relative;
+    }
+    /* Bloc 1 : Photographie */
+    .block:nth-child(1) {
+      background: url('photos/tete.png') no-repeat center/cover;
+      flex-direction: column; text-align: center;
+    }
+    .block:nth-child(1) h2 {
+      font-family: 'PanchangExtraBold', sans-serif;
+      text-transform: uppercase; color: rgb(243,233,215);
+    }
+    /* Bloc 2 : Portfolio */
+    .block:nth-child(2) {
+      background: url('../WEBSITE/images/fondportfolio.png') no-repeat center/cover;
+      background-color: rgb(243,233,215);
+      flex-direction: column; text-transform: uppercase;
+    }
+    .block:nth-child(2) h1 { color: rgb(0,0,0); }
+    .block:nth-child(2) h3 { color: #000; }
+    /* Bloc 3 : Graphisme */
+    .block:nth-child(3) {
+      background: url('photos/fox.jpg') no-repeat center/cover;
+      color: white; font-family: 'PanchangRegular'; text-transform: uppercase;
+    }
+    .block:nth-child(3) h2 {
+      font-family: 'PanchangExtraBold', sans-serif;
+      text-transform: uppercase; color: rgb(243,233,215);
+    }
+    /* Bloc 4 : Développement web */
+    .block:nth-child(4) {
+      background: url('../WEBSITE/images/negatif.jpg') no-repeat center/cover;
+      transition: 0.5s ease-in-out;
+    }
+    .block:nth-child(4):hover {
+      background: url('../WEBSITE/images/positif.jpg') no-repeat center/cover;
+    }
+    /* Bloc 5 : Image */
+    .block:nth-child(5) {
+      background-color: rgb(0,0,0);
+    }
+    .block:nth-child(5) img {
+      position: absolute;
+      width: 10%; height: 10%;
+      transition: transform 1s ease-in-out;
+    }
+    .block:nth-child(5) img:hover {
+      transform: scale(1.1) rotate(180deg);
+      transition-duration: 0.5s;
+    }
+    /* Bloc 6 : Web */
+    .block:nth-child(6) {
+      background-color: rgb(61,30,30);
+      color: rgb(232,213,183);
+      font-family: 'PanchangExtraBold', sans-serif;
+      text-transform: uppercase;
+    }
+    /* Masquer certains titres dans le bloc 2 */
+    .block:nth-child(2) h1,
+    .block:nth-child(2) h2,
+    .block:nth-child(2) h3 { visibility: hidden; }
+    /* Grille mobile */
+    @media (max-width: 767px) {
+      .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(6, 1fr);
+      }
+    }
+    /* Overlay */
+    .overlay {
+      position: fixed; top: 0; left: 0; z-index: 1000;
+      transition: all 0.5s ease-out;
+      overflow: hidden; background: black;
+    }
+    /* Slider container */
+    .image-slider {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      justify-content: center; align-items: center;
+      background: transparent;
+    }
+    /* Dimensions du slider */
+    @media (min-width: 768px) {
+      .image-slider { width: 800px; height: 600px; }
+    }
+    @media (max-width: 767px) {
+      .image-slider { width: 100vw; height: auto; }
+      .slider-text { font-size: 0.9em; }
+    }
+    /* Image dans le slider */
+    .image-slider img {
+      max-width: 100%; max-height: 100%;
+      object-fit: contain;
+      display: block; cursor: pointer;
+    }
+    /* Texte superposé */
+    .slider-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-family: 'PanchangExtraBold', sans-serif;
+      text-transform: uppercase;
+      font-size: 1em;
+    }
+    .slider-text:hover {
+      color: rgb(0,0,0);
+      cursor: pointer;
+    }
+    /* Ajustement pour tablette */
+    @media (min-width: 768px) and (max-width: 1024px) {
+      .block:nth-child(1) h2 { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="container">
+      <!-- Bloc 1 -->
+      <div class="block" @click="handleClick(0, $event)">
+        <h2>photographie.</h2>
+      </div>
+      <!-- Bloc 2 -->
+      <div class="block" @click="handleClick(1, $event)">
+        <h2>portfolio</h2>
+        <h1>Aurélia Foucher</h1>
+        <h3>photographie - graphisme - développement web</h3>
+      </div>
+      <!-- Bloc 3 -->
+      <div class="block" @click="handleClick(2, $event)">
+        <h2>graphisme.</h2>
+      </div>
+      <!-- Bloc 4 -->
+      <div class="block" @click="handleClick(3, $event)"></div>
+      <!-- Bloc 5 -->
+      <div class="block" @click="handleClick(4, $event)">
+        <img src="../WEBSITE/images/pictodog.svg" alt="Image dans le cinquième bloc">
+      </div>
+      <!-- Bloc 6 -->
+      <div class="block" @click="handleClick(5, $event)">
+        <h2>web.</h2>
+      </div>
+    </div>
+    <!-- Overlay & Slider -->
+    <div v-if="activeBlock" class="overlay" :style="overlayStyle" @click="closeOverlay">
+      <div v-if="activeBlock.index === 0 && showSlider" class="image-slider" @click.stop="nextImage">
+        <img :src="currentImage" alt="Slider d'images">
+        <div class="slider-text">tap or click</div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const { createApp, nextTick } = Vue;
+    createApp({
+      data() {
+        return {
+          allowedBlocks: [0, 2, 5],
+          activeBlock: null,
+          overlayStyle: {},
+          showSlider: false,
+          desktopImages: [
+            'photos/lacnoir.jpg',
+            'photos/manu.jpg',
+            'photos/tete.jpg'
+          ],
+          mobileImages: [
+            'photos/lacnoirrotate.jpg',
+            'photos/manurotate.jpg',
+            'photos/tete.jpg'
+          ],
+          currentIndex: 0,
+          isMobile: false
+        };
+      },
+      computed: {
+        currentImage() {
+          return this.isMobile ? this.mobileImages[this.currentIndex] : this.desktopImages[this.currentIndex];
+        }
+      },
+      mounted() {
+        this.isMobile = window.innerWidth < 768;
+      },
+      methods: {
+        handleClick(index, event) {
+          if (this.allowedBlocks.includes(index)) {
+            this.openOverlay(index, event);
+          }
+        },
+        openOverlay(index, event) {
+          const rect = event.currentTarget.getBoundingClientRect();
+          this.activeBlock = { index, rect };
+          if (index === 0) {
+            this.currentIndex = 0;
+            this.showSlider = false;
+          }
+          this.overlayStyle = {
+            top: rect.top + "px",
+            left: rect.left + "px",
+            width: rect.width + "px",
+            height: rect.height + "px",
+            background: "black"
+          };
+          nextTick(() => {
+            setTimeout(() => {
+              Object.assign(this.overlayStyle, {
+                top: "0px",
+                left: "0px",
+                width: "100vw",
+                height: "100vh"
+              });
+              if (index === 0) {
+                setTimeout(() => { this.showSlider = true; }, 500);
+              }
+            }, 50);
+          });
+        },
+        nextImage() {
+          this.currentIndex = (this.currentIndex + 1) % this.desktopImages.length;
+        },
+        closeOverlay() {
+          const rect = this.activeBlock.rect;
+          Object.assign(this.overlayStyle, {
+            top: rect.top + "px",
+            left: rect.left + "px",
+            width: rect.width + "px",
+            height: rect.height + "px"
+          });
+          this.showSlider = false;
+          setTimeout(() => { this.activeBlock = null; }, 500);
+        }
+      }
+    }).mount("#app");
+  </script>
+</body>
+</html>
