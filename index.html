@@ -200,7 +200,12 @@
       .block:nth-child(1) h2 { font-size: 1rem; }
     }
     @media (max-width: 767px) {
- 
+      html, body {
+    overflow-y: auto;
+  }
+  .container {
+  min-height: 100vh;
+}
 
   .block6-container .static-item {
     width: calc(50% - 20px); /* pour avoir deux éléments par ligne avec un peu d'espace */
