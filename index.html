@@ -16,7 +16,7 @@
 
     /* Base */
     html, body {
-      margin: 0; padding: 0;
+      margin: 0; padding: 0; background-color: #000;
     }
     /* Grille principale */
     .container {
@@ -92,7 +92,7 @@
     /* Masquer certains titres dans le bloc 2 */
     .block:nth-child(2) h1,
     .block:nth-child(2) h2,
-    .block:nth-child(2) h3 { visibility: hidden; }
+    .block:nth-child(2) h3 { display: none; }
     /* Grille mobile */
     @media (max-width: 767px) {
       .container {
