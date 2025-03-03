@@ -16,10 +16,7 @@
 
     /* Base */
     html, body {
-      margin: 0; padding: 0; overflow: hidden;
-      background: aquamarine;
-      background-image: linear-gradient(aquamarine, rgb(149,87,225));
-      background-attachment: fixed;
+      margin: 0; padding: 0;
     }
     /* Grille principale */
     .container {
@@ -102,6 +99,8 @@
         grid-template-columns: 1fr;
         grid-template-rows: repeat(6, 1fr);
       }
+      .block:nth-child(2) {
+        background: url('photos/fondportfoliomobile.png') no-repeat center/cover;}
     }
     /* Overlay */
     .overlay {
