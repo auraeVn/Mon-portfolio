@@ -78,7 +78,7 @@
     }
     .block:nth-child(5) img {
       position: absolute;
-      width: 10%; height: 10%;
+      width: 10%; 
       transition: transform 1s ease-in-out;
     }
     .block:nth-child(5) img:hover {
@@ -109,6 +109,51 @@
       transition: all 0.5s ease-out;
       overflow: hidden; background: black;
     }
+    .block6-container {
+      color: rgb(232,213,183);
+      font-family: 'PanchangExtraBold', sans-serif;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;      /* ajustez selon vos besoins */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  /* Ajoutez éventuellement un fond ou d'autres styles */
+}
+
+.block6-container .static-item {
+  margin: 10px;
+  text-align: center;
+  width: 11rem;
+  color:antiquewhite;
+}
+
+.block6-container .static-item img {
+  max-width: 100%;
+  height: auto;
+}
+.block6-container .github img{
+  width: 10%;
+}
+.github{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+}
+.github a{
+ text-decoration: none;
+ color:antiquewhite;
+}
+.block6-container .github .bouton-github{
+  border-radius: 2px;
+  border:1px solid antiquewhite
+}
+
     /* Slider container */
     .image-slider {
       position: absolute;
@@ -186,89 +231,125 @@
         <img :src="currentImage" alt="Slider d'images">
         <div class="slider-text">tap or click</div>
       </div>
+        <!-- Container statique pour le bloc 6 (affiché seulement après agrandissement) -->
+  <div v-if="activeBlock.index === 5 && showBlock6Content" class="block6-container" @click.stop>
+    <div class="github">
+      <img src="photos/github.png" alt="Image statique 1">
+     
+     <div class="bouton-github">
+      <a href="https://github.com/auraeVn?tab=overview&from=2025-02-01&to=2025-02-26">Mon Github</a>
+     </div>
+    </div>
+    <div class="static-item">
+      <img src="photos/qcm.png" alt="Image statique 2">
+      <p>QCM en PHP</p>
+    </div>
+    <div class="static-item">
+      <img src="photos/bibliotheque.png" alt="Image statique 3">
+      <p>Bibliothèque en PHP</p>
+    </div>
+    <div class="static-item">
+      <img src="photos/tim.png" alt="Image statique 4">
+      <p>Portfolio en JS</p>
+    </div>
+    <div class="static-item">
+      <img src="photos/mastermind.png" alt="Image statique 5">
+      <p>MasterMind</p>
+    </div>
+    <!-- Ajoutez d'autres éléments statiques ici -->
     </div>
   </div>
   <script>
     const { createApp, nextTick } = Vue;
-    createApp({
-      data() {
-        return {
-          allowedBlocks: [0, 2, 5],
-          activeBlock: null,
-          overlayStyle: {},
-          showSlider: false,
-          desktopImages: [
-            'photos/lacnoir.jpg',
-            'photos/manu.jpg',
-            'photos/tete.jpg'
-          ],
-          mobileImages: [
-            'photos/lacnoirrotate.jpg',
-            'photos/manurotate.jpg',
-            'photos/tete.jpg'
-          ],
-          currentIndex: 0,
-          isMobile: false
-        };
-      },
-      computed: {
-        currentImage() {
-          return this.isMobile ? this.mobileImages[this.currentIndex] : this.desktopImages[this.currentIndex];
-        }
-      },
-      mounted() {
-        this.isMobile = window.innerWidth < 768;
-      },
-      methods: {
-        handleClick(index, event) {
-          if (this.allowedBlocks.includes(index)) {
-            this.openOverlay(index, event);
-          }
-        },
-        openOverlay(index, event) {
-          const rect = event.currentTarget.getBoundingClientRect();
-          this.activeBlock = { index, rect };
-          if (index === 0) {
-            this.currentIndex = 0;
-            this.showSlider = false;
-          }
-          this.overlayStyle = {
-            top: rect.top + "px",
-            left: rect.left + "px",
-            width: rect.width + "px",
-            height: rect.height + "px",
-            background: "black"
-          };
-          nextTick(() => {
-            setTimeout(() => {
-              Object.assign(this.overlayStyle, {
-                top: "0px",
-                left: "0px",
-                width: "100vw",
-                height: "100vh"
-              });
-              if (index === 0) {
-                setTimeout(() => { this.showSlider = true; }, 500);
-              }
-            }, 50);
-          });
-        },
-        nextImage() {
-          this.currentIndex = (this.currentIndex + 1) % this.desktopImages.length;
-        },
-        closeOverlay() {
-          const rect = this.activeBlock.rect;
-          Object.assign(this.overlayStyle, {
-            top: rect.top + "px",
-            left: rect.left + "px",
-            width: rect.width + "px",
-            height: rect.height + "px"
-          });
-          this.showSlider = false;
-          setTimeout(() => { this.activeBlock = null; }, 500);
-        }
+createApp({
+  data() {
+    return {
+      allowedBlocks: [0, 2, 5],
+      activeBlock: null,
+      overlayStyle: {},
+      showSlider: false,
+      showBlock6Content: false, // Nouvelle variable pour le contenu du bloc 6
+      desktopImages: [
+        'photos/lacnoir.jpg',
+        'photos/manu.jpg',
+        'photos/tete.jpg'
+      ],
+      mobileImages: [
+        'photos/lacnoirrotate.jpg',
+        'photos/manurotate.jpg',
+        'photos/tete.jpg'
+      ],
+      currentIndex: 0,
+      isMobile: false
+    };
+  },
+  computed: {
+    currentImage() {
+      return this.isMobile ? this.mobileImages[this.currentIndex] : this.desktopImages[this.currentIndex];
+    }
+  },
+  mounted() {
+    this.isMobile = window.innerWidth < 768;
+  },
+  methods: {
+    handleClick(index, event) {
+      if (this.allowedBlocks.includes(index)) {
+        this.openOverlay(index, event);
       }
-    }).mount("#app");
+    },
+    openOverlay(index, event) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      this.activeBlock = { index, rect };
+      
+      if (index === 0) {
+        this.currentIndex = 0;
+        this.showSlider = false;
+      }
+      if (index === 5) {
+        this.showBlock6Content = false;
+      }
+      
+      this.overlayStyle = {
+        top: rect.top + "px",
+        left: rect.left + "px",
+        width: rect.width + "px",
+        height: rect.height + "px",
+        background: "black"
+      };
+      nextTick(() => {
+        setTimeout(() => {
+          Object.assign(this.overlayStyle, {
+            top: "0px",
+            left: "0px",
+            width: "100vw",
+            height: "100vh"
+          });
+          if (index === 0) {
+            setTimeout(() => { this.showSlider = true; }, 500);
+          } else if (index === 5) {
+            setTimeout(() => { this.showBlock6Content = true; }, 500);
+          }
+        }, 50);
+      });
+    },
+    nextImage() {
+      this.currentIndex = (this.currentIndex + 1) % this.desktopImages.length;
+    },
+    closeOverlay() {
+      const rect = this.activeBlock.rect;
+      Object.assign(this.overlayStyle, {
+        top: rect.top + "px",
+        left: rect.left + "px",
+        width: rect.width + "px",
+        height: rect.height + "px"
+      });
+      this.showSlider = false;
+      this.showBlock6Content = false; // Réinitialise le contenu du bloc 6
+      setTimeout(() => { this.activeBlock = null; }, 500);
+    }
+  }
+}).mount("#app");
+
   </script>
 </body>
 </html>
