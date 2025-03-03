@@ -14,10 +14,18 @@
     @font-face { font-family: 'PanchangExtralight'; src: url('../WEBSITE/css/fonts/Panchang-Extralight.woff') format('woff'); font-weight: 300; }
     @font-face { font-family: 'Chalise'; src: url('../WEBSITE/css/fonts/CSChalise-Regular_demo-BF66ab08ad28f4a.otf') format('opentype'); }
 
-    /* Base */
     html, body {
-      margin: 0; padding: 0; background-color: #000;
-    }
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+body::after {
+  content: "";
+  display: block;
+  height: 1px;
+}
     /* Grille principale */
     .container {
       display: grid;
