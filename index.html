@@ -1,380 +1,309 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Vue - Overlay et slider optimisé</title>
-  <!-- Import de Vue 3 depuis CDN -->
-  <script src="https://unpkg.com/vue@3"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aurélia Foucher</title>
+  <link rel="icon" href="photos/favicon.ico" type="image/x-icon" />
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
   <style>
-    /* Fonts */
-    @font-face { font-family: 'PanchangExtraBold'; src: url('../WEBSITE/css/fonts/Panchang-ExtraBold.woff') format('woff'); font-weight: 800; }
-    @font-face { font-family: 'PanchangSemibold'; src: url('../WEBSITE/css/fonts/Panchang-Semibold.woff') format('woff'); font-weight: 700; }
-    @font-face { font-family: 'PanchangRegular'; src: url('../WEBSITE/css/fonts/Panchang-Regular.woff') format('woff'); font-weight: 500; }
-    @font-face { font-family: 'PanchangExtralight'; src: url('../WEBSITE/css/fonts/Panchang-Extralight.woff') format('woff'); font-weight: 300; }
-    @font-face { font-family: 'Chalise'; src: url('../WEBSITE/css/fonts/CSChalise-Regular_demo-BF66ab08ad28f4a.otf') format('opentype'); }
+    :root { --cream:#fffefc; --black:#000; }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--black);height:100%;min-height:100vh;cursor: url('photos/cursor.png') 8 8, auto;}
 
-    html, body {
-  margin: 0;
-  padding: 0;
-  background-color: #000;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+    /* Fonts (chemins conservés) */
+    @font-face{font-family:'PanchangExtraBold';src:url('../WEBSITE/css/fonts/Panchang-ExtraBold.woff') format('woff');font-weight:800}
+    @font-face{font-family:'PanchangSemibold';src:url('../WEBSITE/css/fonts/Panchang-Semibold.woff') format('woff');font-weight:700}
+    @font-face{font-family:'PanchangRegular';src:url('../WEBSITE/css/fonts/Panchang-Regular.woff') format('woff');font-weight:500}
+    @font-face{font-family:'PanchangExtralight';src:url('../WEBSITE/css/fonts/Panchang-Extralight.woff') format('woff');font-weight:300}
+    @font-face{font-family:'Chalise';src:url('../WEBSITE/css/fonts/CSChalise-Regular_demo-BF66ab08ad28f4a.otf') format('opentype')}
+    @font-face{font-family:'Megants';src:url('fonts/Megants.otf') format('opentype')}
+    @font-face{font-family:'Minion';src:url('fonts/MinionProSemiboldDisplay.otf') format('opentype')}
+    @font-face{font-family:'Foerte';src:url('fonts/Foerte.ttf') format('truetype')}
+
+    /* ======== GRID LAYOUT ======== */
+    .container{
+      display:grid;
+      grid-template-columns:50% 25% 25%;
+      grid-template-rows:50% 50%;
+      width:100vw;height:100vh;position:relative
+    }
+
+
+    .block{width:100%;height:100%;display:flex;justify-content:center;align-items:center;position:relative;overflow:hidden;background:var(--cream)}
+.block img {
+  cursor: pointer; /* seulement sur les images cliquables */
 }
-body::after {
-  content: "";
+    /* Block 1: Photographie (moitié gauche, 2 rangées) */
+    .block:nth-child(1){grid-column:1/2;grid-row:1/3;background:url('photos/statuenb.png') no-repeat center/cover,var(--cream);flex-direction:column;text-align:center}
+    .titrephoto{ pointer-events: auto;width:34vw;height:auto;z-index:2;display:block;transition: opacity 0.8s ease-out;}
+    .titrephoto-desktop{display:block; padding-bottom:17%;}
+ .titrephoto:hover {
+  opacity: 0.5;}
+    .titrephoto-mobile{display:none;width:44vw}
+    .block:nth-child(1) h2{font-family:'Megants',sans-serif;text-transform:uppercase;font-size:1.3rem}
+
+/* Bloc 3 : Graphisme → haut gauche de la moitié droite */
+.block:nth-child(3) {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+  position: relative; /* nécessaire pour centrer le titre */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* Titre invisible pour SEO */
+.block:nth-child(3) h2, .block:nth-child(6) h2  {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+/* SVG du titre */
+.titregraphisme{
+  max-height: 60%;
+  max-width: 60%;
   display: block;
-  height: 1px;
+  transform: rotate(-90deg);
+  transform-origin: center;
 }
-    /* Grille principale */
-    .container {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: 60% 40%;
-      width: 100vw; height: 100vh;
-      position: relative;
-    }
-    .block {
-      width: 100%; height: 100%;
-      cursor: pointer;
-      display: flex;
-      justify-content: center; align-items: center;
-      background-color: lightblue;
-      box-sizing: border-box;
-      position: relative;
-    }
-    /* Bloc 1 : Photographie */
-    .block:nth-child(1) {
-      background: url('photos/tete.png') no-repeat center/cover;
-      flex-direction: column; text-align: center;
-    }
-    .block:nth-child(1) h2 {
-      font-family: 'PanchangExtraBold', sans-serif;
-      text-transform: uppercase; color: rgb(243,233,215);
-    }
-    /* Bloc 2 : Portfolio */
-    .block:nth-child(2) {
-      background: url('photos/fondportfolio.png') no-repeat center/cover;
-      background-color: rgb(243,233,215);
-      flex-direction: column; text-transform: uppercase;
-    }
-    .block:nth-child(2) h1 { color: rgb(0,0,0); }
-    .block:nth-child(2) h3 { color: #000; }
-    /* Bloc 3 : Graphisme */
-    .block:nth-child(3) {
-      background: url('photos/fox.jpg') no-repeat center/cover;
-      color: white; font-family: 'PanchangRegular'; text-transform: uppercase;
-    }
-    .block:nth-child(3) h2 {
-      font-family: 'PanchangExtraBold', sans-serif;
-      text-transform: uppercase; color: rgb(243,233,215);
-    }
-    /* Bloc 4 : Développement web */
-    .block:nth-child(4) {
-      background: url('photos/negatif.jpg') no-repeat center/cover;
-      transition: 0.5s ease-in-out;
-    }
-    .block:nth-child(4):hover {
-      background: url('photos/positif.jpg') no-repeat center/cover;
-    }
-    /* Bloc 5 : Image */
-    .block:nth-child(5) {
-      background-color: rgb(0,0,0);
-    }
-    .block:nth-child(5) img {
-      position: absolute;
-      width: 10%; 
-      transition: transform 1s ease-in-out;
-    }
-    .block:nth-child(5) img:hover {
-      transform: scale(1.1) rotate(180deg);
-      transition-duration: 0.5s;
-    }
-    /* Bloc 6 : Web */
-    .block:nth-child(6) {
-      background-color: rgb(61,30,30);
-      color: rgb(232,213,183);
-      font-family: 'PanchangExtraBold', sans-serif;
-      text-transform: uppercase;
-    }
-    /* Masquer certains titres dans le bloc 2 */
-    .block:nth-child(2) h1,
-    .block:nth-child(2) h2,
-    .block:nth-child(2) h3 { display: none; }
-    /* Grille mobile */
-    @media (max-width: 767px) {
-      .container {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(6, 1fr);
-      }
-      .block:nth-child(2) {
-        background: url('photos/fondportfoliomobile.png') no-repeat center/cover;}
-    }
-    /* Overlay */
-    .overlay {
-      position: fixed; top: 0; left: 0; z-index: 1000;
-      transition: all 0.5s ease-out;
-      overflow: hidden; background: black;
-    }
-    .block6-container {
-      color: rgb(232,213,183);
-      font-family: 'PanchangRegular', sans-serif;
-      font-size: 0.8rem;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 70%;      /* ajustez selon vos besoins */
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  /* Ajoutez éventuellement un fond ou d'autres styles */
+.titregraphisme:hover{
+  opacity: 0.5;
 }
+.titregraphisme-mobile{display:none;width:44vw}
 
-.block6-container .static-item {
-  margin: 10px;
-  text-align: center;
-  width: 11rem;
-  color:antiquewhite;
-}
 
-.block6-container .static-item img {
-  max-width: 100%;
-  height: auto;
+    /* Block 6: Graphisme décor (haut droit droite) */
+    .block:nth-child(6){grid-column:3/4;grid-row:1/2;background:url('photos/rayures.svg') no-repeat center/cover,var(--cream);}
+     .graphismedecor { pointer-events: auto;width:10vw;height:auto;z-index:2;transition: all 0.5s ease-out;}
+     .graphismedecor:hover {
+  filter: drop-shadow(2px 2px 0px #597ef7);
 }
+    .block:nth-child(6) h2{font-size:1.4rem;text-shadow:-5px 5px 0 rgba(89,126,247,1)}
 
-.block6-container .github img{
-  width: 10%;
+    /* Block 2: Aurélia Foucher (bas droit pleine largeur) */
+    .block:nth-child(2){grid-column:2/4;grid-row:2/3;display:flex;flex-direction:column;text-align:center;gap:5%;color:#000}
+    .block:nth-child(2) h1{font:1.3rem 'Megants',sans-serif;text-transform:uppercase;position:absolute!important;width:1px;height:1px;padding:0;margin:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .photonom{width:25%}
+.photonom:hover{
+  opacity: 0.5;
 }
-.github{
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  
-}
-.github a{
- text-decoration: none;
- color:antiquewhite;
-}
-.block6-container .github .bouton-github{
-  border-radius: 20px;
-  border:1px solid antiquewhite;
-  padding:12px 25px;
-  margin-bottom: 30px;
-}
+    /* Hide 4 & 5 on desktop; they'll reappear on mobile */
+    .block:nth-child(4),.block:nth-child(5){display:none}
 
-    /* Slider container */
-    .image-slider {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      display: flex;
-      justify-content: center; align-items: center;
-      background: transparent;
+    /* Dog icon desktop (conserve) */
+    .dog-icon-desktop{top:calc(60vh + 20vh);left:33.33vw;width:40px;transition:transform 1s ease-in-out;z-index:2}
+    .dog-icon-desktop:hover{transform:translateX(0%) scale(1.1) rotate(180deg);transition-duration:.5s}
+
+    /* ======== OVERLAY (général) ======== */
+    .overlay{position:fixed;inset:0;z-index:1000;background:var(--cream);transition:all .5s ease-out;overflow:hidden}
+    /* Spécifique bloc 2 : carte centrée cliquable autour */
+    .overlay.overlay-block2{display:flex;justify-content:center;align-items:center;padding:4vh 4vw}
+
+    /* Slider */
+    .image-slider{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:flex;justify-content:center;align-items:center}
+    .image-slider img{max-height:80vh;max-width:90vw;height:auto;width:auto;object-fit:contain;display:block;cursor:pointer}
+
+    /* Bloc 2 overlay */
+    .block2-content{position:relative;width:min(900px,92vw);max-height:84vh;display:flex;justify-content:center;align-items:center}
+    .block2-inner{width:100%;background:rgba(255,255,255,.9);border-radius:12px;padding:2.5rem;display:flex;flex-direction:column;justify-content:center;overflow:auto}
+    .grid-2{display:grid;grid-template-columns:repeat(3,1fr);gap:4rem 2rem;width:100%;max-width:900px;margin:0 auto;place-items:center;align-items:start}
+    .cell{border-radius:6px;font-family:'Minion',sans-serif;font-size:.9rem;text-align:justify;width:100%}
+
+    /* PDF */
+    .pdf-container{position:relative;width:100%;height:100%;margin:auto;background:#fff}
+    .btn-close{position:absolute;top:40px;left:10px;z-index:10;background:red;color:#fff;border:none;border-radius:5px;padding:5px 10px;cursor:pointer}
+
+    /* ======== RESPONSIVE ======== */
+    @media (min-width:768px){html,body{overflow:hidden}.overlay{overflow:hidden}}
+
+    @media (max-width:1024px) and (min-width:768px){
+      .grid-2{grid-template-columns:repeat(2,1fr);width:100%!important;max-width:100vw!important;gap:1.5rem;margin-top:1.2rem;margin-bottom:1.2rem}
+      .block2-inner{overflow-y:auto!important;padding:2.5rem!important}
+      .titregraphisme{max-width:90%}
+      .graphismedecor {width:15vw}
+      .photonom{width:35%}
     }
-    /* Dimensions du slider */
-    @media (min-width: 768px) {
-      .image-slider { width: 800px; height: 600px; }
-    }
-    @media (max-width: 767px) {
-      .image-slider { width: 100vw; height: auto; }
-      .slider-text { font-size: 0.9em; }
-    }
-    /* Image dans le slider */
-    .image-slider img {
-      max-width: 100%; max-height: 100%;
-      object-fit: contain;
-      display: block; cursor: pointer;
-    }
-    /* Texte superposé */
-    .slider-text {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-family: 'PanchangExtraBold', sans-serif;
-      text-transform: uppercase;
-      font-size: 1em;
-    }
-    .slider-text:hover {
-      color: rgb(0,0,0);
-      cursor: pointer;
-    }
-    /* Ajustement pour tablette */
-    @media (min-width: 768px) and (max-width: 1024px) {
-      .block:nth-child(1) h2 { font-size: 1rem; }
-    }
-    @media (max-width: 767px) {
-      html, body {
-    overflow-y: auto;
+
+    @media (max-width:767px){
+      html,body{overflow-y:auto}
+       .block {
+    background-color: var(--cream) !important;
   }
-  .container {
-  min-height: 100vh;
-}
+      .container{grid-template-columns:1fr;grid-template-rows:repeat(4,1fr);grid-template-areas:'block2' 'block1' 'block6' 'block3'}
+      .block:nth-child(1){grid-area:block1}
+      .block:nth-child(2){grid-area:block2}
+      .block:nth-child(3){grid-area:block3}
+      .block:nth-child(6){grid-area:block6}
 
-  .block6-container .static-item {
-    width: calc(50% - 20px); /* pour avoir deux éléments par ligne avec un peu d'espace */
-    margin: 10px;
+        /* Supprimer block4 et block5 en mobile */
+  .block:nth-child(4), .block:nth-child(5) {
+    display: none !important;
   }
+
+      
+        .overlay.overlay-block2 {
+    padding: 4vh 10vw; /* plus d'espace cliquable sur les côtés */
+    align-items: flex-start; /* colle le contenu en haut */
+    
+  }
+   .block2-content {
+    height: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+   .block2-inner {
+    height: 100%;
+    overflow-y: auto; /* scroll interne */
+    -ms-overflow-style: none; /* IE et Edge */
+  scrollbar-width: none;    /* Firefox */
+    padding-top: 1rem !important;
+  }
+  .block2-inner::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
+      .grid-2{grid-template-columns:1fr;gap:1.2rem 0!important;width:100%!important;max-width:100vw!important;margin-top:0}
+      .cell{width:100%!important;max-width:100vw!important;font-size:.9rem!important;display:block!important}
+      .block2-inner{justify-content:flex-start!important;align-items:stretch!important;overflow-y:auto!important;padding:2.5rem!important}
+      .titrephoto-desktop{display:none}
+      .titrephoto-mobile{display:block;width:80vw}
+      .titregraphisme{display:none;}
+      .titregraphisme-mobile{display:block;width:12vw; /* supprime la rotation */}
+      .graphismedecor {width:30vw}
+    }
   </style>
 </head>
 <body>
   <div id="app">
     <div class="container">
-      <!-- Bloc 1 -->
+      
+      <!-- Block 1: Photographie -->
       <div class="block" @click="handleClick(0, $event)">
-        <h2>photographie.</h2>
+        <img class="titrephoto titrephoto-desktop" src="photos/titrephoto.svg" alt="titrephoto desktop" />
+        <img class="titrephoto titrephoto-mobile" src="photos/photographiemobile.svg" alt="titrephoto mobile" />
       </div>
-      <!-- Bloc 2 -->
+
+      <!-- Block 2: Portfolio (bas droit) -->
       <div class="block" @click="handleClick(1, $event)">
-        <h2>portfolio</h2>
         <h1>Aurélia Foucher</h1>
-        <h3>photographie - graphisme - développement web</h3>
+        <img class="photonom" src="photos/titreaurelia.svg" alt="Nom" />
+        <img class="dog-icon-desktop" src="photos/pictodogshadow.svg" alt="Icône Dog" />
       </div>
-      <!-- Bloc 3 -->
+
+      <!-- Block 3: Graphisme (haut droit gauche) -->
       <div class="block" @click="handleClick(2, $event)">
-        <h2>graphisme.</h2>
+        <h2>gra&shy;phis&shy;me</h2>
+        <img class="titregraphisme" src="photos/titregraphisme.svg" alt="Graphisme">
+         <img class="titregraphisme-mobile" src="photos/titregraphismemobile.svg" alt="titre graphisme mobile" />
       </div>
-      <!-- Bloc 4 -->
-      <div class="block" @click="handleClick(3, $event)"></div>
-      <!-- Bloc 5 -->
-      <div class="block" @click="handleClick(4, $event)">
-        <img src="photos/pictodog.svg" alt="Image dans le cinquième bloc">
+
+      <!-- Block 4: Dog icon mobile (masqué desktop) -->
+      <div class="block" @click="handleClick(3, $event)">
+        <img class="dog-icon-mobile" src="photos/pictodog.svg" alt="Icône Dog" />
       </div>
-      <!-- Bloc 6 -->
+
+      <!-- Block 5: Empty / extra content (masqué desktop) -->
+      <div class="block" @click="handleClick(4, $event)"></div>
+
+      <!-- Block 6: Graphisme décor (haut droit droite) -->
       <div class="block" @click="handleClick(5, $event)">
-        <h2>web.</h2>
+        <h2>graphisme decor</h2>
+        <img class="graphismedecor" src="photos/graphsimedecor.svg" alt="titrephoto desktop" />
       </div>
     </div>
-    <!-- Overlay & Slider -->
-    <div v-if="activeBlock" class="overlay" :style="overlayStyle" @click="closeOverlay">
-      <div v-if="activeBlock.index === 0 && showSlider" class="image-slider" @click.stop="nextImage">
-        <img :src="currentImage" alt="Slider d'images">
-        <div class="slider-text">tap or click</div>
+
+    <!-- OVERLAY with conditional class for block 2 card mode -->
+    <div v-if="activeBlock" class="overlay" :class="{'overlay-block2': activeBlock && activeBlock.index === 1}" :style="overlayStyle" @click.self="closeOverlay">
+      <!-- Block 0: Photographie (Slider) -->
+      <div v-if="activeBlock.index === 0 && showSlider" class="image-slider" @click.stop="nextImage" aria-label="Galerie photo">
+        <img :src="currentImage" alt="Image du slider" />
       </div>
-        <!-- Container statique pour le bloc 6 (affiché seulement après agrandissement) -->
-  <div v-if="activeBlock.index === 5 && showBlock6Content" class="block6-container" @click.stop>
-    <div class="github">
-      <img src="photos/github.png" alt="Image statique 1">
-     
-    
-      <a href="https://github.com/auraeVn?tab=overview&from=2025-02-01&to=2025-02-26" class="bouton-github">Mon Github</a>
-    
-    </div>
-    <div class="static-item">
-      <img src="photos/qcm.png" alt="Image statique 2">
-      <p>QCM <br> PHP</p>
-    </div>
-    <div class="static-item">
-      <img src="photos/bibliotheque.png" alt="Image statique 3">
-      <p>Bibliothèque <br> PHP</p>
-    </div>
-    <div class="static-item">
-      <img src="photos/tim.png" alt="Image statique 4">
-      <p>Portfolio <br> JS</p>
-    </div>
-    <div class="static-item">
-      <img src="photos/mastermind.png" alt="Image statique 5">
-      <p>MasterMind <br> JS</p>
-    </div>
-    <!-- Ajoutez d'autres éléments statiques ici -->
+
+      <!-- Block 1: Portfolio (texte) -->
+      <div v-if="activeBlock.index === 1 && showBlock2Grid" class="block2-content">
+        <div class="block2-inner" @click.stop>
+          <div class="grid-2">
+            <div class="cell">Ce portfolio que j’ai codé en Vue JS est un aperçu de mon univers artistique et professionnel. Diplômée des Beaux-Arts de Montpellier, j’ai passé la majeure partie de ma carrière professionnelle en tant qu’artiste plasticienne et photographe. J’ai travaillé en restauration, un choix qui m’a permis de financer mes projets artistiques.</div>
+            <div class="cell">PHOTOGRAPHIE. La première partie de ce portfolio est une petite sélection (issue de différentes séries) de mon travail réalisé à la chambre photographique 5x7 ou au polaroïd. J’expérimente la photographie argentique depuis 2015. Aujourd’hui, mes recherches s’articulent autour de ma fascination pour les mondes virtuels et immersifs et de la frontière entre le réel et le virtuel, notamment en prolongeant mon travail photographique grâce à l’IA.</div>
+            <div class="cell">GRAPHISME DÉCOR. Dans cette section, j’ai voulu présenter quelques éléments de graphisme décors que j’ai pu réaliser pendant mon stage sur le LM La mer au loin de Saïd Hamich fin 2023. De nombreux éléments ont été réalisés avec MidJourney. Le reste étant travaillé avec Illustrator et/ou Photoshop. Cette première expérience en tant qu’assistante graphiste m’a vraiment enthousiasmée et stimulée, et c’est pour ça que j’ai suivi une formation infographiste après ça, afin de me perfectionner dans la suite Adobe et viser le métier de graphiste de décoration.</div>
+            <div class="cell">GRAPHISME DÉCOR. Dans une deuxième partie, j’ai choisi de montrer quelques projets réalisés pendant ma formation Infographiste (2024), notamment une fausse campagne de pub pour Haribo réalisée en partie en IA. Enfin, une affiche de film que j’ai créée, retouchée et mise en page.</div>
+            <div class="cell">WEB. Tout au long de mon parcours, j’ai été fascinée par le monde du virtuel, de l’immersif, et en particulier par la réalité virtuelle. Les possibilités infinies qu’offre le monde numérique m’ont attirée et j’ai vu le développement web comme une extension naturelle de ma passion pour l’art visuel. C’est cette passion pour les univers virtuels, mais aussi pour les langages, qui m’ont poussée à m’orienter vers le développement web. Pour moi, l’apprentissage des langages informatiques était un pas indispensable pour intégrer le numérique à mes projets artistiques.</div>
+            <div class="cell">PHOTOGRAPHIE. Extraits de mon travail personnel à la chambre photographique et au polaroïd. GRAPHISME DÉCOR. Extraits de mon travail de graphisme sur le long métrage La mer au loin et pendant ma formation. WEB. Extraits de mon travail de développement web à travers quelques réalisations (site et applications).</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PDF (Graphisme & Web) plein écran -->
+      <div v-if="(activeBlock.index === 2 || activeBlock.index === 5) && showPdfContent" class="pdf-container" @click.stop>
+        <button class="btn-close" @click.stop="closeOverlay" aria-label="Fermer">X</button>
+        <iframe src="photos/portefolio.pdf" style="width:100%;height:100%;" frameborder="0" title="Portfolio PDF"></iframe>
+      </div>
     </div>
   </div>
+
   <script>
     const { createApp, nextTick } = Vue;
-createApp({
-  data() {
-    return {
-      allowedBlocks: [0, 2, 5],
-      activeBlock: null,
-      overlayStyle: {},
-      showSlider: false,
-      showBlock6Content: false, // Nouvelle variable pour le contenu du bloc 6
-      desktopImages: [
-        'photos/lacnoir.jpg',
-        'photos/manu.jpg',
-        'photos/tete.jpg'
-      ],
-      mobileImages: [
-        'photos/lacnoirrotate.jpg',
-        'photos/manurotate.jpg',
-        'photos/tete.jpg'
-      ],
-      currentIndex: 0,
-      isMobile: false
-    };
-  },
-  computed: {
-    currentImage() {
-      return this.isMobile ? this.mobileImages[this.currentIndex] : this.desktopImages[this.currentIndex];
-    }
-  },
-  mounted() {
-    this.isMobile = window.innerWidth < 768;
-  },
-  methods: {
-    handleClick(index, event) {
-      if (this.allowedBlocks.includes(index)) {
-        this.openOverlay(index, event);
-      }
-    },
-    openOverlay(index, event) {
-      const rect = event.currentTarget.getBoundingClientRect();
-      this.activeBlock = { index, rect };
-      
-      if (index === 0) {
-        this.currentIndex = 0;
-        this.showSlider = false;
-      }
-      if (index === 5) {
-        this.showBlock6Content = false;
-      }
-      
-      this.overlayStyle = {
-        top: rect.top + "px",
-        left: rect.left + "px",
-        width: rect.width + "px",
-        height: rect.height + "px",
-        background: "black"
-      };
-      nextTick(() => {
-        setTimeout(() => {
-          Object.assign(this.overlayStyle, {
-            top: "0px",
-            left: "0px",
-            width: "100vw",
-            height: "100vh"
-          });
-          if (index === 0) {
-            setTimeout(() => { this.showSlider = true; }, 500);
-          } else if (index === 5) {
-            setTimeout(() => { this.showBlock6Content = true; }, 500);
-          }
-        }, 50);
-      });
-    },
-    nextImage() {
-      this.currentIndex = (this.currentIndex + 1) % this.desktopImages.length;
-    },
-    closeOverlay() {
-      const rect = this.activeBlock.rect;
-      Object.assign(this.overlayStyle, {
-        top: rect.top + "px",
-        left: rect.left + "px",
-        width: rect.width + "px",
-        height: rect.height + "px"
-      });
-      this.showSlider = false;
-      this.showBlock6Content = false; // Réinitialise le contenu du bloc 6
-      setTimeout(() => { this.activeBlock = null; }, 500);
-    }
-  }
-}).mount("#app");
+    createApp({
+      data(){
+        return {
+          allowedBlocks:new Set([0,1,2,5]),
+          activeBlock:null,
+          overlayStyle:{},
+          showSlider:false,
+          showBlock2Grid:false,
+          showPdfContent:false,
+          desktopImages:[
+            'photos/lacnoir.jpg','photos/lacnoir2.jpg','photos/tete.jpg','photos/tete2.jpg','photos/nuit.jpg','photos/statue.png','photos/cyris.jpg','photos/clara.jpg','photos/pola1.png'
+          ],
+          mobileImages:[ 'photos/lacnoirrotate.jpg','photos/manurotate.jpg','photos/tete.jpg','photos/tete2.jpg' ],
+          currentIndex:0,
+          isMobile:false
+        }
+      },
+      computed:{
+        currentImages(){ return this.isMobile ? this.mobileImages : this.desktopImages },
+        currentImage(){ return this.currentImages[this.currentIndex] }
+      },
+      mounted(){
+        const check=()=>{ this.isMobile = window.innerWidth < 768 }
+        check(); window.addEventListener('resize',check)
+      },
+      methods:{
+        handleClick(index,evt){ if(!this.allowedBlocks.has(index)) return; this.openOverlay(index,evt) },
+        openOverlay(index,event){
+          const rect = event.currentTarget.getBoundingClientRect();
+          this.activeBlock = { index, rect };
 
+          this.showSlider=false; this.showBlock2Grid=false; this.showPdfContent=false;
+
+          let background = 'var(--cream)', backgroundSize='auto';
+          if(index===1){ background = "url('photos/a.svg') no-repeat center, var(--cream)"; backgroundSize='30% auto, auto' }
+
+          this.overlayStyle = { top:rect.top+'px', left:rect.left+'px', width:rect.width+'px', height:rect.height+'px', background, backgroundSize };
+
+          nextTick(()=>{ setTimeout(()=>{
+            Object.assign(this.overlayStyle,{ top:'0px', left:'0px', width:'100vw', height:'100vh', backgroundSize: index===1 ? 'cover':'auto' });
+            const delay=500;
+            if(index===0) setTimeout(()=>{ this.currentIndex=0; this.showSlider=true },delay);
+            if(index===1) setTimeout(()=>{ this.showBlock2Grid=true },delay);
+            if(index===2||index===5) setTimeout(()=>{ this.showPdfContent=true },delay);
+          },50) })
+        },
+        nextImage(){ const len=this.currentImages.length; this.currentIndex=(this.currentIndex+1)%len },
+        closeOverlay(){
+          this.showBlock2Grid=false; this.showSlider=false; this.showPdfContent=false;
+          const { rect, index } = this.activeBlock;
+          const newBgSize = index===1 ? `${rect.width}px ${rect.height}px` : 'auto';
+          Object.assign(this.overlayStyle,{ top:rect.top+'px', left:rect.left+'px', width:rect.width+'px', height:rect.height+'px', backgroundSize:newBgSize });
+          setTimeout(()=>{ this.activeBlock=null },500)
+        }
+      }
+    }).mount('#app')
   </script>
 </body>
 </html>
