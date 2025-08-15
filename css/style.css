@@ -150,10 +150,4 @@
    .titrephoto-mobile{display:block;width:60vw}
    .titregraphisme{display:none;}
    .titregraphisme-mobile{display:block;width:5vw;transform: rotate(90deg);}
-   .graphismedecor {width:30vw; height:auto;
-  z-index:2; display:block; 
-  -webkit-user-select:none;
-  user-select:none;
-  touch-action: manipulation;    /* évite certains “double tap” iOS */
-  -webkit-backface-visibility: hidden;
-  transform: translateZ(0);}}
+   .graphismedecor {width:30vw; height:auto;}}
