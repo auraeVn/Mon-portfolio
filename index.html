@@ -42,7 +42,7 @@
 
       <!-- Block 6: Graphisme décor (haut droit droite) -->
       <div class="block" @click="handleClick(5, $event)">
-        <h2>graphisme decor</h2>
+        <!-- <h2>graphisme decor</h2> -->
         <img class="graphismedecor" src="photos/graphismedecor.svg" alt="titrephoto desktop" />
       </div>
     </div>
@@ -73,15 +73,22 @@
      class="pdf-container" 
      @click.stop>
   <button class="btn-close" @click.stop="closeOverlay" aria-label="Fermer">X</button>
-
+<a
+  :href="activeBlock.index === 2 ? 'photos/graphisme.pdf' : 'photos/graphismedecor.pdf'"
+  target="_blank"
+  style="position:absolute; right:12px; top:40px; z-index:11; font: 14px/1.2 sans-serif; background:#000; color:#fff; padding:6px 10px; border-radius:6px; text-decoration:none;">
+  Ouvrir dans un onglet
+</a>
   <iframe 
     :src="activeBlock.index === 2 
-      ? 'photos/graphisme.pdf#zoom=page-fit' 
-      : 'photos/graphismedecor.pdf#zoom=page-fit'" 
+      ? 'photos/graphisme.pdf#zoom=page-fitH' 
+      : 'photos/graphismedecor.pdf#zoom=page-fitH'" 
     style="width:100%;height:100%;" 
     frameborder="0" 
     title="Portfolio PDF">
   </iframe>
+
+
     </div>
     </div>
   </div>
