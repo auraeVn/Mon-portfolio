@@ -49,10 +49,24 @@
 
     <!-- OVERLAY with conditional class for block 2 card mode -->
     <div v-if="activeBlock" class="overlay" :class="{'overlay-block2': activeBlock && activeBlock.index === 1}" :style="overlayStyle" @click.self="closeOverlay">
-      <!-- Block 0: Photographie (Slider) -->
-      <div v-if="activeBlock.index === 0 && showSlider" class="image-slider" @click.stop="nextImage" aria-label="Galerie photo">
-        <img :src="currentImage" alt="Image du slider" />
-      </div>
+     <!-- Block 0: Photographie (PDF) -->
+<div v-if="activeBlock.index === 0 && showPhotoPdf" class="pdf-container" @click.stop>
+  <button class="btn-close" @click.stop="closeOverlay" aria-label="Fermer">X</button>
+
+  <a
+    href="photos/photographies.pdf"
+    target="_blank"
+    style="position:absolute; right:12px; top:40px; z-index:11; font: 14px/1.2 sans-serif; background:#000; color:#fff; padding:6px 10px; border-radius:6px; text-decoration:none;">
+    Ouvrir dans un onglet
+  </a>
+
+  <iframe
+    src="photos/photographies.pdf#zoom=page-fitH"
+    style="width:100%;height:100%;"
+    frameborder="0"
+    title="Portfolio Photographie">
+  </iframe>
+</div>
 
       <!-- Block 1: Portfolio (texte) -->
       <div v-if="activeBlock.index === 1 && showBlock2Grid" class="block2-content">
